@@ -738,7 +738,7 @@ vif(model3_2_1_base_3)
 
 #FC - longit cognition cohort PET MTL####################################################
 
-
+#base
 plot3_2_1_change_base <- ggplot(data_7T_rs_PET_MTL_cog,aes(x=metaROI_DVR,y=EM_composite_change))+
   geom_point()+geom_smooth(method="lm")
 plot3_2_1_change_base
@@ -748,57 +748,20 @@ shapiro.test(rstandard(model3_2_1_change_base))
 bptest(model3_2_1_change_base)
 vif(model3_2_1_change_base)
 
-#FC*apoe
-plot3_2_1_change <- ggplot(data_7T_rs_PET_MTL_cog,aes(x=SUB_LH_HH.CA1_LH_HH,y=EM_composite_change, color= APOE4_carrier))+
+#FC as predictor
+plot3_2_1_change <- ggplot(data_7T_rs_PET_MTL_cog,aes(x=SUB_LH_HH.CA1_LH_HH,y=EM_composite_change))+
   geom_point()+geom_smooth(method="lm")+plot_theme()+
   labs(
     x = "rsFC left CA1 head - left subiculum head",
-    y = "Change in episodic memory performance (scaled)",
-    color = expression(italic("APOE4")~group))+
-  scale_color_manual(values = c("0" = "#0072B2", "1" = "#D55E00"),
-                     labels = c("0" = "Non-Carrier", "1" = "Carrier"))
+    y = "Change in episodic memory performance (scaled)")
 plot3_2_1_change
 
-model3_2_1_change <- lm(EM_composite_change ~scale(metaROI_DVR)+ scale(SUB_LH_HH.CA1_LH_HH)*APOE4_carrier+ scale(age) + sex + scale(education), data = data_7T_rs_PET_MTL_cog)
+model3_2_1_change <- lm(EM_composite_change ~scale(metaROI_DVR)+ scale(SUB_LH_HH.CA1_LH_HH)+APOE4_carrier+ scale(age) + sex + scale(education), data = data_7T_rs_PET_MTL_cog)
 summary(model3_2_1_change)
 shapiro.test(rstandard(model3_2_1_change)) 
 bptest(model3_2_1_change)
 vif(model3_2_1_change)
 tab_model(model3_2_1_change, df.method = "satterthwaite", show.stat = TRUE, show.se = TRUE, show.std = TRUE, file = "model3_2_1_change.doc")
-
-
-#Cohens f squared
-# full and reduced models
-mdl_full <- lm(EM_composite_change ~scale(metaROI_DVR)+ scale(SUB_LH_HH.CA1_LH_HH)*APOE4_carrier+ scale(age) + sex + scale(education), data = data_7T_rs_PET_MTL_cog)
-mdl_reduced <- lm(EM_composite_change ~scale(metaROI_DVR)+ scale(SUB_LH_HH.CA1_LH_HH)+APOE4_carrier+ scale(age) + sex + scale(education), data = data_7T_rs_PET_MTL_cog)
-# R²
-R2_full <- r.squaredGLMM(mdl_full)[1]   # marginal R²
-R2_red  <- r.squaredGLMM(mdl_reduced)[1]
-# Delta R²
-deltaR2 <- R2_full - R2_red
-# f²
-f2 <- deltaR2 / (1 - R2_full)
-R2_full; R2_red; deltaR2; f2
-
-
-#subgroups APOE
-data_apoe4_pos <- subset(data_7T_rs_PET_MTL_cog, APOE4_carrier == 1)
-data_apoe4_neg <- subset(data_7T_rs_PET_MTL_cog, APOE4_carrier == 0)
-
-model_apoe4_pos  <- lm(EM_composite_change ~scale(metaROI_DVR)+ scale(SUB_LH_HH.CA1_LH_HH)+ scale(age) + sex + scale(education), data = data_apoe4_pos)
-summary(model_apoe4_pos)
-vif(model_apoe4_pos)
-bptest(model_apoe4_pos)
-shapiro.test(rstandard(model_apoe4_pos))
-tab_model(model_apoe4_pos,df.method = "satterthwaite",show.stat = TRUE,show.se = TRUE,show.std = TRUE,file = "model_3_2_1_change_apoe4_carriers.doc")
-
-model_apoe4_neg  <- lm(EM_composite_change ~scale(metaROI_DVR)+ scale(SUB_LH_HH.CA1_LH_HH)+ scale(age) + sex + scale(education), data = data_apoe4_neg)
-summary(model_apoe4_neg)
-vif(model_apoe4_neg)
-bptest(model_apoe4_neg)
-shapiro.test(rstandard(model_apoe4_neg))
-tab_model( model_apoe4_neg,df.method = "satterthwaite",show.stat = TRUE, show.se = TRUE,show.std = TRUE,file = "model_3_2_1_change_apoe4_noncarriers.doc")
-
 
 
 
